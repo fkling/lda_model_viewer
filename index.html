@@ -11,7 +11,7 @@
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="span2">
-          <h3>LDA Model Viewer<sup><span class="label label-info">alpha</span></sup></h3>
+          <h3>LDA Model Viewer&nbsp;<sup><span class="label label-info">alpha</span></sup></h3>
           <div id="sidebar">
             <div id="file_info" class="well" data-bind="visible: name">
               <div><strong>File name:</strong> <span data-bind="text: name"></span></div>
@@ -31,7 +31,8 @@
                   <div class="bar" data-bind="style: {width: progress() + '%'}"></div>
                 </div>
               </div>
-              <!-- ko if: topics().length > 0 -->
+              <!-- ko if: words().length > 0 -->
+              <!-- ko if: (topics().length > 0 && topics().length < 6) -->
               <h5>Topic</h5>
               <ul id="topic_selector" data-bind="foreach: topics">
                 <li>
@@ -39,6 +40,12 @@
                 <span data-bind="text: name"></span>
                 </li>
               </ul>
+              <!-- /ko -->
+              <!-- ko if: topics().length > 5 -->
+              <h5>Topic</h5>
+              <select id="topic_selector" name="topic" data-bind="foreach: topics">
+                <option data-bind="value: value, checked: $parent.selectedTopic,text: name" ></option>
+              </select>
               <!-- /ko -->
               <h5>Number of Words</h5>
               <input type="range" min="0" max="1000" step="50" data-bind="value: topNWords" style="width: 100%"/>
@@ -55,6 +62,7 @@
                 </li>
               </ul>
               <button type="button" class="btn btn-small" data-bind="click: function() { $root.selectedWords.removeAll()}">Clear</button>
+              <!-- /ko -->
               <!-- /ko -->
             </div>
           </div>
