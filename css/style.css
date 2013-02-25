@@ -1,0 +1,80 @@
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+.progress .bar {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -ms-transition: none;
+  -o-transition: none;
+  transition: none;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+#topic_selector {
+  list-style: none;
+  margin-left: 0;
+}
+
+#sidebar {
+  position: fixed;
+  top: 100px;
+}
+
+#sidebar_right {
+  margin-top: 100px;
+}
+
+h1 {
+  color: #333;
+  font-family: monospace;
+}
+
+#word_cloud svg {
+  border: 2px solid #333;
+  border-radius: 5px;
+}
+
+.selected {
+  font-weight: bold;
+}
+
+#selected_words {
+  list-style: none;
+  margin-left: 0;
+}
+
+#selected_words li {
+  margin: 5px;
+  border: 1px solid #555;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+#top_n_words td.word {
+  user-select: none;
+  cursor: pointer;
+}
+
+#top_n_words {
+  white-space: nowrap;
+  height: 300px;
+}
+
+#top_n_words .word_list {
+  width: 150px;
+  display: inline-block;
+  margin-left: 10px;
+  margin-right: 10px;
+}
