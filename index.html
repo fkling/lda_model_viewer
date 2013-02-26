@@ -43,8 +43,7 @@
               <!-- /ko -->
               <!-- ko if: topicNames().length > 5 -->
               <h5>Topic</h5>
-              <select id="topic_selector" name="topic" data-bind="options: topicNames, optionsText: 'name', optionsText: 'value', value: selectedTopic">
-                <option data-bind="value: value, text: name" ></option>
+              <select id="topic_selector" name="topic" data-bind="options: topicNames, optionsText: 'name', optionsValue: 'value', value: selectedTopic">
               </select>
               <!-- /ko -->
               <h5>Number of Words</h5>
