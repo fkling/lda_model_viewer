@@ -1,32 +1,40 @@
 function DescriptiveModel() {
+  Widget.call(this, document.getElementById('topic_descriptive'));
   this.numberOfWords = ko.observable(10);
-  this.width = 960;
-  this.height = 500;
-  this.radius = Math.min(this.width, this.height) / 2;
 
-  this.color = d3.scale.category20();
+  this.color = d3.scale.category20c();
 
   this.pie = d3.layout.pie()
     .sort(null)
     .value(function(d) { return d.value;});
 
+
+  this.svg = d3.select("#topic_descriptive").append("svg");
+  this.c = this.svg.append("g");
+
+  ko.applyBindings(this, this.container_);
+  this.numberOfWords.subscribe(this.draw, this);
+  dataModel.wordMap.subscribe(this.draw, this);
+
+  this.enableFullscreen();
+}
+
+Widget.inherits(DescriptiveModel);
+
+DescriptiveModel.prototype.draw = function() {
+  this.width = this.getWidth();
+  this.height = this.getHeight();
+  this.radius = Math.min(this.width, this.height) / 2;
+
   this.arc = d3.svg.arc()
-    .innerRadius(this.radius - 100)
+    .innerRadius(this.radius - (this.radius * 0.6))
     .outerRadius(this.radius - 20);
 
-  this.svg = d3.select("#topic_descriptive").append("svg")
-    .attr("width", this.width)
-    .attr("height", this.height)
-    .append("g")
+ this.c
     .attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
 
-  this.numberOfWords.subscribe(this.recompute_, this);
-  dataModel.wordMap.subscribe(function() {
-    this.recompute_(this.numberOfWords());
-  }, this);
-
-  ko.applyBindings(this, document.getElementById('topic_descriptive'));
-}
+  this.recompute_(this.numberOfWords());
+};
 
 DescriptiveModel.prototype.recompute_ = function(n) {
   var topics = dataModel.topics();
@@ -50,9 +58,12 @@ DescriptiveModel.prototype.recompute_ = function(n) {
       data[words[word][0]].value += 1;
     }
   }
+  data = data.filter(function(obj) { return obj.value > 0; });
 
-  var g = this.svg.selectAll(".arc")
+  var g = this.c.selectAll(".arc")
     .data(this.pie(data));
+
+  g.exit().remove();
 
   var new_g = g.enter().append("g").attr('class', 'arc');
   new_g.append('path');

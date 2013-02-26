@@ -1,34 +1,39 @@
 function WordCloudModel() {
-  this.visible = ko.observable(false);
-  this.width = 600;
-  this.height = 600;
-  this.fill = d3.scale.category20b();
+  Widget.call(this, document.getElementById('word_cloud'));
 
-  var svg = d3.select('#word_cloud').append("svg")
-    .attr("width", this.width)
-    .attr("height", this.width);
-  this.background_ = svg.append("g");
-  this.vis_ = svg.append("g")
-    .attr("transform", "translate(" + [this.width >> 1, this.height >> 1] + ")");
+  this.fill = d3.scale.category20b();
+  this.svg = d3.select('#word_cloud').append("svg");
+  this.background_ = this.svg.append("g");
+  this.vis_ = this.svg.append("g");
+
 
   this.cloud_ = d3.layout.cloud()
-    .size([this.width, this.height])
     .timeInterval(10)
     .text(function(d) { return d.word; })
     .font("Arial")
     .rotate(0)
     .on("end", this.draw_words_.bind(this));
 
-  ko.applyBindings(this, document.getElementById('word_cloud'));
-  dataModel.filteredData.subscribe(this.setTerms, this);
+  ko.applyBindings(this, this.container_);
+  this.enableFullscreen();
+  dataModel.filteredData.subscribe(this.draw, this);
 }
 
+Widget.inherits(WordCloudModel);
+
+WordCloudModel.prototype.draw = function(words) {
+  this.width = this.getWidth();
+  this.height = this.getHeight() - 50;
+    this.svg.attr("height", this.height);
+  this.vis_.attr("transform", "translate(" + [this.width >> 1, this.height >> 1] + ")");
+
+  this.cloud_.size([this.width, this.height]);
+  words = words || this.words_;
+  this.words_ = words;
+  this.setTerms(words);
+};
+
 WordCloudModel.prototype.setTerms = function(words) {
-  if (words.length === 0) {
-    this.visible(false);
-    return;
-  }
-  this.visible(true);
   var word_map = dataModel.wordMap();
   var data = dataModel.getData();
   var topic = +dataModel.selectedTopic();
