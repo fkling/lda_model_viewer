@@ -1,18 +1,19 @@
 function DataModel() {
-  this.topics = ko.observableArray();
-  this.topicData = ko.observableArray();
+  this.topicNames = ko.observableArray();
+  this.topics = ko.observable();
   this.filteredData = ko.observableArray();
   this.topNWords = ko.observable(100);
   this.selectedTopic = ko.observable(0);
   this.selectedWords = ko.observableArray();
   this.metric = ko.observable(0);
+  this.data = ko.observable();
 
   this.processing = ko.observable(false);
   this.progress = ko.observable(0);
 
-  this.words = ko.observable([]);
-  this.wordMap = {};
-  
+  this.wordMap = ko.observable([]);
+  this.reverseWordMap = {};
+
   fileModel.wordMap.subscribe(function(wm) {
     this.selectedWords([]);
     this.numTopics = 0;
@@ -20,20 +21,19 @@ function DataModel() {
       this.numTopics = wm[word].length;
     }
 
-    this.topics.removeAll();
+    var names = [];
     for(var i = 0; i < this.numTopics; i++) {
-      this.topics.push({name: 'Topic ' + (i+1), value: i});
+      names.push({name: 'Topic ' + (i+1), value: i});
     }
+    this.topicNames(names);
 
-    this.prepareWordMap(wm);
+    this.prepareData(wm);
   }, this);
 
-  this.selectedTopic.subscribe(function() {
-    this.updateTopicData();
-  }, this);
+  this.selectedTopic.subscribe(this.filterData.bind(this));
 
   this.topNWords.subscribe(function() {
-    this.truncateData(); 
+    this.filterData();
   }, this);
 
   this.selectedWords.subscribe(function(val) {
@@ -45,69 +45,80 @@ function DataModel() {
   ko.applyBindings(this, document.getElementById('filter'));
 }
 
-DataModel.prototype.prepareWordMap = function(wm) {
+DataModel.prototype.getData = function() {
+  return this.data()[this.metric()];
+};
+
+DataModel.prototype.getOffset = function(word_index, topic_index) {
+  return word_index * this.num_topics * 8 + i + topic_index * 8;
+};
+
+DataModel.prototype.prepareData = function(wm) {
   // Normalize data
   var self = this;
   var num_topics = this.numTopics;
-  var topics = [];
-  var words = [];
-  var sum = [];
-  var wordMap = {};
+  var num_words = fileModel.numWords();
+  var raw_data = new ArrayBuffer(num_topics * num_words * 8);
+  var norm_data = new ArrayBuffer(num_topics * num_words * 8);
+  var raw_data_view = new Float64Array(raw_data);
+  var norm_data_view = new Float64Array(norm_data);
+  var data = [
+    raw_data_view,
+    norm_data_view
+  ];
+  var wordMap = [];
+  var reverseWordMap = {};
+  var sum = new Array(this.numTopics);
   for (var i = 0; i < this.numTopics; i++) {
-    sum.push(0);
-    topics.push([]);
+    sum[i] = 0;
   }
 
   this.progress(0);
   this.processing('Normalising data');
 
-  batch(wm, 10000, function(key, value, index, total) {
-    words[index] = key;
-    for (var i = 0, l = value.length; i < l; i++) {
-        sum[i] += value[i];
-        topics[i][index] = [index, [value[i]]];
+  batch(wm, 5000, function(key, values, index, total) {
+    wordMap[index] = key;
+    for (var i = 0, l = values.length; i < l; i++) {
+        sum[i] += values[i];
     }
-    wordMap[key] = [value];
+    raw_data_view.set(values, index * num_topics);
+    reverseWordMap[key] = index;
     self.progress(Math.round((index / (total*2)) * 100) );
   }).then(function() {
-    return batch(words, 10000, function(index, word, cindex, total) {
-      var values = [];
-      for (var i = 0, l = num_topics; i < l; i++) {
-        var value = topics[i][index][1] / sum[i];
-        topics[i][index][1][1]= value;
-        values.push(value);
+    var l = num_topics;
+    return batch(wordMap, 5000, function(index, word, cindex, total) {
+      var ndata = norm_data_view;
+      var rdata = raw_data_view;
+      for (var i = 0, o = index * num_topics; i < l; i += 1,o += 1 ) {
+        ndata[o] = rdata[o] / sum[i];
       }
-      wordMap[word].push(values);
       self.progress(Math.round(((total + index) / (total*2)) * 100) );
     });
   }).then(function() {
-    topics.forEach(function(list) {
-      list.sort(function(a, b) {
-        return b[1][0] - a[1][0];
+    var topics = new Array(num_topics);
+    var rdata = raw_data_view;
+    var ntopics = num_topics;
+    for (var i = 0, l = num_topics; i < l; i++) {
+      topics[i] = d3.range(num_words).sort(function(a, b) {
+        return rdata[b*ntopics + i] - rdata[a*ntopics + i];
       });
-    });
+    }
 
-    self.topic_values = topics;
-    self.words(words);
-    self.wordMap = wordMap;
+    self.data(data);
+    self.topics(topics);
+    self.reverseWordMap = reverseWordMap;
+    self.wordMap(wordMap);
 
     self.processing(false);
-    self.updateTopicData();
+    self.filterData();
   });
 };
 
-DataModel.prototype.updateTopicData = function() {
-  var topic = this.selectedTopic();
-  if (this.words().length === 0) {
-   return;
-  } 
-
-  this.topicData(this.topic_values[topic]);
-  this.truncateData();
-};
-
-DataModel.prototype.truncateData = function() {
-  this.filteredData(this.topicData.slice(0, this.topNWords()));
+DataModel.prototype.filterData = function() {
+  if (this.topics().length === 0) {
+    return;
+  }
+  this.filteredData(this.topics()[+this.selectedTopic()].slice(0, this.topNWords()));
 };
 
 DataModel.prototype.addWord = function(word) {

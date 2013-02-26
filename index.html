@@ -24,27 +24,27 @@
                 </div>
               </div>
             </div>
-            <div id="filter" class="well" data-bind="visible: topics().length > 0">
+            <div id="filter" class="well" data-bind="visible: topicNames().length > 0">
               <div data-bind="visible: processing">
                 <span data-bind="text: processing"></span>:
                 <div class="progress progress-striped active">
                   <div class="bar" data-bind="style: {width: progress() + '%'}"></div>
                 </div>
               </div>
-              <!-- ko if: words().length > 0 -->
-              <!-- ko if: (topics().length > 0 && topics().length < 6) -->
+              <!-- ko if: wordMap().length > 0 -->
+              <!-- ko if: (topicNames().length > 0 && topicNames().length < 6) -->
               <h5>Topic</h5>
-              <ul id="topic_selector" data-bind="foreach: topics">
+              <ul id="topic_selector" data-bind="foreach: topicNames">
                 <li>
                 <input type="radio" name="topic" data-bind="value: value, checked: $parent.selectedTopic" />
                 <span data-bind="text: name"></span>
                 </li>
               </ul>
               <!-- /ko -->
-              <!-- ko if: topics().length > 5 -->
+              <!-- ko if: topicNames().length > 5 -->
               <h5>Topic</h5>
-              <select id="topic_selector" name="topic" data-bind="foreach: topics">
-                <option data-bind="value: value, checked: $parent.selectedTopic,text: name" ></option>
+              <select id="topic_selector" name="topic" data-bind="options: topicNames, optionsText: 'name', optionsText: 'value', value: selectedTopic">
+                <option data-bind="value: value, text: name" ></option>
               </select>
               <!-- /ko -->
               <h5>Number of Words</h5>
@@ -75,7 +75,7 @@
           <div id="top_n_words" data-bind="foreach: {data: words, as: 'list'}">
             <div class="word_list well">
               <h4 data-bind="text: 'Topic ' + ($index() +1)"></h4>
-              <table data-bind="foreach: list">
+              <table style="width: 100%" data-bind="foreach: list">
                 <tr>
                   <!-- ko if: dataModel.selectedWords.indexOf(word) > -1 -->
                   <td class="word selected" data-bind="text: word, click: $root.selectWord, style: {color: dataModel.selectedWordColor(word)}"></td>
@@ -83,7 +83,7 @@
                   <!-- ko if: dataModel.selectedWords.indexOf(word) == -1 -->
                   <td class="word" data-bind="text: word, click: $root.selectWord"></td>
                   <!-- /ko -->
-                  <td data-bind="text: value.toFixed(value < 1 ? 4 : 1)"></td>
+                  <td style="text-align: right" data-bind="text: value.toFixed(value < 1 ? 4 : 1)"></td>
                 </tr>
               </table>
             </div>
@@ -94,7 +94,7 @@
           <div id="word_stats" data-bind="visible: dataModel.selectedWords().length">
             <h2>Word stats</h2>
           </div>
-          <div id="topic_descriptive" data-bind="visible: dataModel.topicData().length">
+          <div id="topic_descriptive" data-bind="visible: dataModel.wordMap().length">
             <h2>Topic descriptiveness</h2>
             <p>Number of unique words in the top <span data-bind="text: numberOfWords"></span> words of each topic.
             </p>
@@ -118,8 +118,8 @@
     <script src="js/batch.js"></script>
     <script src="js/FileModel.js"></script>
     <script src="js/DataModel.js"></script>
-    <script src="js/WordCloudModel.js"></script>
     <script src="js/TopNWordsModel.js"></script>
+    <script src="js/WordCloudModel.js"></script>
     <script src="js/WordStatsModel.js"></script>
     <script src="js/DescriptiveModel.js"></script>
   </body>

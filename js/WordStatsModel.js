@@ -51,13 +51,15 @@ WordStatsModel.prototype.updateChart = function(words) {
   if (words.length === 0) {
     return;
   }
-  var metric = dataModel.metric();
-  var topics = d3.range(dataModel.numTopics).map(function(i) { return 'Topic ' + (i+1); });
-  var data = topics.map(function(topic, i) {
+  var dataset = dataModel.getData();
+  var rWordMap = dataModel.reverseWordMap;
+  var nTopics = dataModel.numTopics;
+  var topics = d3.range(nTopics).map(function(i) { return 'Topic ' + (i+1); });
+  var data = topics.map(function(topic, topic_index) {
     return {
       topic: topic,
       stats: words.map(function(word) {
-        return {word: word, value: dataModel.wordMap[word][metric][i]};
+        return {word: word, value: dataset[rWordMap[word] * nTopics + topic_index]};
       })
     };
   });

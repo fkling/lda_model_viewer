@@ -29,10 +29,13 @@ WordCloudModel.prototype.setTerms = function(words) {
     return;
   }
   this.visible(true);
-  var word_list = dataModel.words();
+  var word_map = dataModel.wordMap();
+  var data = dataModel.getData();
+  var topic = +dataModel.selectedTopic();
+  var nTopics = dataModel.numTopics;
 
-  words = words.map(function(value) {
-    return {word: word_list[value[0]], value: value[1][0]};
+  words = words.map(function(word_index) {
+    return {word: word_map[word_index], value: data[word_index * nTopics + topic]};
   });
 
   var fontSize = d3.scale.log()

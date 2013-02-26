@@ -21,7 +21,7 @@ function DescriptiveModel() {
     .attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
 
   this.numberOfWords.subscribe(this.recompute_, this);
-  dataModel.words.subscribe(function() {
+  dataModel.wordMap.subscribe(function() {
     this.recompute_(this.numberOfWords());
   }, this);
 
@@ -29,15 +29,14 @@ function DescriptiveModel() {
 }
 
 DescriptiveModel.prototype.recompute_ = function(n) {
-  var topics = dataModel.topic_values;
-  var word_map = dataModel.words();
+  var topics = dataModel.topics();
   var words = {};
   var color = this.color;
   var arc = this.arc;
-  
+
   topics.forEach(function(list, index) {
     for(var i = 0; i < n; i++) {
-      var word = list[i][0];
+      var word = list[i];
       if (!(word in words)) {
         words[word] = [];
       }
@@ -65,7 +64,7 @@ DescriptiveModel.prototype.recompute_ = function(n) {
   g.select('path')
     .transition()
     .attr("d", arc)
-    .attr("fill", function(d) { console.log(d);return color(d.data.index); });
+    .attr("fill", function(d) { return color(d.data.index); });
 
   g.select('text')
     .transition()
