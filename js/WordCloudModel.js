@@ -36,6 +36,8 @@ WordCloudModel.prototype.setTerms = function(words) {
 
   words = words.map(function(word_index) {
     return {word: word_map[word_index], value: data[word_index * nTopics + topic]};
+  }).filter(function(obj) {
+    return obj.value > 0;
   });
 
   var fontSize = d3.scale.log()
