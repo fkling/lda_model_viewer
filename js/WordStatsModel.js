@@ -2,7 +2,7 @@ function WordStatsModel() {
   Widget.call(this, document.getElementById('word_stats'));
   this.selectedWord = ko.observable('');
 
-  this.svg = d3.select("#word_stats").append("svg");
+  this.svg = d3.select("#word_stats > .content").append("svg");
   this.c = this.svg.append("g");
 
   this.x = this.c.append("g")

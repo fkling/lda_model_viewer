@@ -91,9 +91,11 @@
       </div>
       <div id="word_cloud" data-bind="visible: dataModel.filteredData().length > 0">
         <h2>Word Cloud</h2>
+        <div class="content"></div>
       </div>
       <div id="word_stats" data-bind="visible: dataModel.selectedWords().length">
         <h2>Word stats</h2>
+        <div class="content"></div>
       </div>
       <div id="topic_descriptive" data-bind="visible: dataModel.wordMap().length">
         <h2>Topic descriptiveness</h2>
@@ -103,7 +105,7 @@
           <input type="range" min="5" max="100" step="5" data-bind="value: numberOfWords" style="width: 200px"/>
           <span><span data-bind="text: numberOfWords"></span> words</span>
         </div>
-
+        <div class="content"></div>
       </div>
     </div>
     <div class="right">

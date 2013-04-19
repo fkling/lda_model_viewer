@@ -26,7 +26,7 @@ Widget.prototype.getHeight = function() {
     return parseInt(d3.select('#fullscreen > .content').style('height'), 10);
   }
   else {
-    return 400;
+    return parseInt(d3.select(this.container_).select('.content').style('height'), 10);
   }
 };
 

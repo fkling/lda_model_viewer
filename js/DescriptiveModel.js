@@ -8,7 +8,7 @@ function DescriptiveModel() {
     .value(function(d) { return d.value;});
 
 
-  this.svg = d3.select("#topic_descriptive").append("svg");
+  this.svg = d3.select("#topic_descriptive > .content").append("svg");
   this.c = this.svg.append("g");
 
   ko.applyBindings(this, this.container_);

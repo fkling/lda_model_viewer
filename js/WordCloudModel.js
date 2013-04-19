@@ -2,7 +2,7 @@ function WordCloudModel() {
   Widget.call(this, document.getElementById('word_cloud'));
 
   this.fill = d3.scale.category20b();
-  this.svg = d3.select('#word_cloud').append("svg");
+  this.svg = d3.select('#word_cloud > .content').append("svg");
   this.background_ = this.svg.append("g");
   this.vis_ = this.svg.append("g");
 
