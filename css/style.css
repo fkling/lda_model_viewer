@@ -79,11 +79,6 @@ h1 {
   font-family: monospace;
 }
 
-#word_cloud svg {
-  border: 2px solid #333;
-  border-radius: 5px;
-}
-
 .selected {
   font-weight: bold;
 }
@@ -120,9 +115,12 @@ h1 {
 
 .widget {
   width: 100%;
+  margin: 10px;
+}
+
+.widget > .content {
   height: 400px;
   position: relative;
-  margin: 10px;
   box-sizing: content-box;
 }
 

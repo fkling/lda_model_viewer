@@ -107,6 +107,13 @@
         </div>
         <div class="content"></div>
       </div>
+      <div id="timeline" data-bind="visible: dataModel.wordMap().length">
+        <h2>Inference</h2>
+        <div class="legend" data-bind="foreach: legend">
+            <input type="checkbox" data-bind="value: $data, checked: $parent.selectedTopics">
+            <span data-bind="style: {color: $parent.color($data)}, text: $data"></span>
+        </div>
+        <div class="content" style="border-radius: 3px; border: 1px solid #555"></div>
     </div>
     <div class="right">
     </div>
@@ -129,5 +136,6 @@
     <script src="js/WordCloudModel.js"></script>
     <script src="js/WordStatsModel.js"></script>
     <script src="js/DescriptiveModel.js"></script>
+    <script src="js/Timeline.js"></script>
   </body>
 </html>
