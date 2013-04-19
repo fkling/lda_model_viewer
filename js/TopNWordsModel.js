@@ -3,6 +3,8 @@ function TopNWordsModel() {
   this.nWords = 10;
   dataModel.wordMap.subscribe(this.prepareLists_, this);
   dataModel.metric.subscribe(this.prepareLists_, this);
+  dataModel.filterExpression.subscribe(this.prepareLists_, this);
+  dataModel.filterInclude.subscribe(this.prepareLists_, this);
 
   ko.applyBindings(this, document.getElementById('top_n_words'));
 }
@@ -15,12 +17,19 @@ TopNWordsModel.prototype.prepareLists_ = function() {
   var nWords = this.nWords;
 
   this.words(topics.map(function(list, topic_index) {
-    return list.slice(0, nWords).map(function(word_index) {
-      return {
-        word: word_map[word_index],
-        value: data[word_index * num_topics + topic_index]
-      };
-    });
+    var d = [];
+    var i = 0;
+    while (d.length < nWords && i < list.length) {
+      var word = word_map[list[i]];
+      if (dataModel.include(word)) {
+        d.push({
+          word: word,
+          value: data[list[i] * num_topics + topic_index]
+        });
+      }
+      i++;
+    }
+    return d;
   }));
 };
 

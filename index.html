@@ -11,7 +11,7 @@
     <div class="left">
       <h3>LDA Model Viewer&nbsp;<sup><span class="label label-info">alpha</span></sup></h3>
       <div id="sidebar">
-        <div id="file_info" class="well" data-bind="visible: name">
+        <div id="file_info" class="well" data-bind="visible: name" style="overflow: hidden">
           <div><strong>File name:</strong> <span data-bind="text: name"></span></div>
           <div><strong># words:</strong> <span data-bind="text: numWords"></span></div>
           <div><strong># topics:</strong> <span data-bind="text: numTopics"></span></div>
@@ -44,8 +44,12 @@
           <select id="topic_selector" name="topic" data-bind="options: topicNames, optionsText: 'name', optionsValue: 'value', value: selectedTopic">
           </select>
           <!-- /ko -->
+          <h5>Filter by expression</h2>
+          <input data-bind="value: filterExpression" style="width: 100%;"/>
+          <label><input type="radio" name="filter_include" value="false" data-bind="checked: filterInclude"> Exclude</label>
+          <label><input type="radio" name="filter_include" value="true" data-bind="checked: filterInclude"> Include</label>
           <h5>Number of Words</h5>
-          <input type="range" min="0" max="1000" step="50" data-bind="value: topNWords" style="width: 100%"/>
+          <input type="range" min="0" max="1000" step="10" data-bind="value: topNWords" style="width: 100%"/>
           <span data-bind="text: topNWords"></span>
           <h5>Metric</h5>
           <label><input type="radio" name="metric" value="0" data-bind="checked: metric" /> Score</label>
@@ -72,7 +76,7 @@
       <div id="top_n_words" data-bind="foreach: {data: words, as: 'list'}">
         <div class="word_list well">
           <h4 data-bind="text: 'Topic ' + ($index() +1)"></h4>
-          <table style="width: 100%" data-bind="foreach: list">
+          <table data-bind="foreach: list">
             <tr>
               <!-- ko if: dataModel.selectedWords.indexOf(word) > -1 -->
               <td class="word selected" data-bind="text: word, click: $root.selectWord, style: {color: dataModel.selectedWordColor(word)}"></td>

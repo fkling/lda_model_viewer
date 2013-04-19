@@ -70,7 +70,7 @@ WordStatsModel.prototype.draw = function(words) {
 };
 
 WordStatsModel.prototype.updateChart = function(words) {
-  if (words.length === 0) {
+  if (!words || words.length === 0) {
     return;
   }
   var dataset = dataModel.getData();

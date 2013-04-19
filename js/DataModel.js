@@ -7,6 +7,9 @@ function DataModel() {
   this.selectedWords = ko.observableArray();
   this.metric = ko.observable(0);
   this.data = ko.observable();
+  this.filterExpression = ko.observable('');
+  this.expression_ = null;
+  this.filterInclude = ko.observable('false');
 
   this.processing = ko.observable(false);
   this.progress = ko.observable(0);
@@ -30,11 +33,16 @@ function DataModel() {
     this.prepareData(wm);
   }, this);
 
-  this.selectedTopic.subscribe(this.filterData.bind(this));
+  var timer;
 
-  this.topNWords.subscribe(function() {
+  this.filterExpression.subscribe(function(val) {
+    this.expression_ = val ? new RegExp(val) : null;
     this.filterData();
   }, this);
+
+  this.selectedTopic.subscribe(this.filterData.bind(this));
+  this.topNWords.subscribe(this.filterData.bind(this));
+  this.filterInclude.subscribe(this.filterData.bind(this));
 
   this.selectedWords.subscribe(function(val) {
     if (val.length === 0) {
@@ -118,7 +126,28 @@ DataModel.prototype.filterData = function() {
   if (this.topics().length === 0) {
     return;
   }
-  this.filteredData(this.topics()[+this.selectedTopic()].slice(0, this.topNWords()));
+  var wordMap = this.wordMap();
+  var words = [];
+  var l = this.topNWords();
+  var i = 0;
+  var topic = this.topics()[+this.selectedTopic()];
+  while (words.length < l && i < topic.length) {
+    var word = wordMap[topic[i]];
+    if (this.include(word)) {
+      words.push(topic[i]);
+    }
+    i++;
+  }
+
+ this.filteredData(words);
+};
+
+DataModel.prototype.include = function(word) {
+  if (!this.expression_) {
+    return true;
+  }
+  var result = this.expression_.test(word);
+  return this.filterInclude() === "true" ? result : !result;
 };
 
 DataModel.prototype.addWord = function(word) {

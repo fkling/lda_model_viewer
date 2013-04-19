@@ -1,7 +1,6 @@
 function DescriptiveModel() {
   Widget.call(this, document.getElementById('topic_descriptive'));
   this.numberOfWords = ko.observable(10);
-
   this.color = d3.scale.category20c();
 
   this.pie = d3.layout.pie()
@@ -15,6 +14,7 @@ function DescriptiveModel() {
   ko.applyBindings(this, this.container_);
   this.numberOfWords.subscribe(this.draw, this);
   dataModel.wordMap.subscribe(this.draw, this);
+  dataModel.filteredData.subscribe(this.draw, this);
 
   this.enableFullscreen();
 }
@@ -41,14 +41,19 @@ DescriptiveModel.prototype.recompute_ = function(n) {
   var words = {};
   var color = this.color;
   var arc = this.arc;
+  var wm = dataModel.wordMap();
 
   topics.forEach(function(list, index) {
-    for(var i = 0; i < n; i++) {
+    var found_words = 0;
+    for(var i = 0, l = list.length; found_words < n && i < l; i++) {
       var word = list[i];
-      if (!(word in words)) {
-        words[word] = [];
+      if (dataModel.include(wm[word])) {
+        found_words += 1;
+        if (!(word in words)) {
+          words[word] = [];
+        }
+        words[word].push(index);
       }
-      words[word].push(index);
     }
   });
 
