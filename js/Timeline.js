@@ -129,10 +129,14 @@ Timeline.prototype.updateChart = function(series) {
     this.c.selectAll('.topic').remove();
     return;
   }
-  this.x.domain([0, series.length]);
-  this.y.domain([0, d3.max(series, function(d) {
-    return d3.max(d.map(parseFloat));
-  })]);
+
+  // Sum all series together
+  var sum = series.map(function(val) {
+    return d3.sum(val);
+  });
+
+  this.x.domain([0, series.length + 1]);
+  this.y.domain([0, d3.max(sum)]);
 
   var x = this.x;
   var y = this.y;
@@ -152,6 +156,7 @@ Timeline.prototype.updateChart = function(series) {
   }).filter(function(d) {
     return this.selectedTopics().indexOf(d.name) > -1;
   }, this);
+  data.push({name: 'Sum', values: sum});
 
   var color = this.color; 
 
@@ -160,12 +165,19 @@ Timeline.prototype.updateChart = function(series) {
   lines.enter().append('g')
     .attr('class', 'topic')
     .append('path')
-    .attr('class', 'line');
+    .attr('class', 'line')
+    .style('stroke-width', 2)
+    .style('fill', 'transparent');
 
   lines.selectAll('.line')
     .attr('d', function (d) { return line(d.values); })
-    .style("stroke", function(d) { return color(d.name); })
-    .style('fill', 'transparent');
+    .style("stroke", function(d) { return d.name === 'Sum' ? '#AAA' : color(d.name); });
+
+  lines.each(function(d) {
+    if (d.name === 'Sum') {
+      d3.select(this).style("stroke-dasharray", ("3, 3"));
+    }
+  });
 
   lines.exit().remove();
 };
